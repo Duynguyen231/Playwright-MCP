@@ -98,10 +98,11 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const pageUrl = '${{ steps.deployment.outputs.page_url }}';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '## 🎭 Playwright Test Results\n\n✅ Tests completed! [📊 View Full Report](${{ steps.deployment.outputs.page_url }})'
+              body: `## 🎭 Playwright Test Results\n\n✅ Tests completed!\n\n**[📊 View Full Test Report](${pageUrl || 'Check GitHub Actions Artifacts tab'})**`
             });
         continue-on-error: true

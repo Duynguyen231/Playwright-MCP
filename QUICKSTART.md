@@ -87,6 +87,45 @@ npx playwright test tests/e2e/auth/login.spec.ts
 npx playwright test --ui
 ```
 
+## 📊 Viewing Test Reports
+
+After running tests, you can easily view the HTML report in several ways:
+
+### **Locally (After Running Tests)**
+
+```bash
+# Run tests
+npm run test
+
+# View the report in your browser
+npm run test:report
+```
+
+Or directly:
+```bash
+npx playwright show-report
+```
+
+### **In GitHub (Pull Requests)**
+
+When you push code or create a PR, Playwright tests run automatically and the workflow:
+- ✅ Generates an HTML report
+- ✅ Deploys it to GitHub Pages
+- ✅ Posts a comment on your PR with a direct link: **[📊 View Full Test Report]()**
+
+The report link will be available in the PR comments.
+
+### **Available Test Commands**
+
+```bash
+npm run test              # Run all tests
+npm run test:headed      # Run tests with browser visible
+npm run test:debug       # Debug mode with step-by-step execution
+npm run test:ui          # Interactive UI mode
+npm run test:saucedemo   # Run only SauceDemo tests
+npm run test:report      # Open latest test report
+```
+
 ## What You Get
 
 ✅ **Agent Skill** - Structured workflow for writing E2E tests
