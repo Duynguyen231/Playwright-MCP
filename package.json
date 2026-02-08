@@ -22,6 +22,11 @@
     "test:ui": "playwright test --ui",
     "test:saucedemo": "playwright test tests/e2e/saucedemo/",
     "test:report": "playwright show-report",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:integration": "playwright test --grep @integration",
+    "test:regression": "playwright test --grep @regression",
+    "test:e2e": "playwright test --grep @e2e",
+    "test:visual": "playwright test --grep @visual",
     "lint": "eslint tests/**/*.ts specs/**/*.ts --fix-dry-run",
     "lint:fix": "eslint tests/**/*.ts specs/**/*.ts --fix"
   }

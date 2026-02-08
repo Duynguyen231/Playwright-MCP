@@ -25,7 +25,7 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
    *          When the user attempts to login
    *          Then the user should be logged in and redirected to the inventory page
    */
-  test('should allow standard_user to login successfully', async ({ loginPage, page }) => {
+  test('@smoke @integration @e2e should allow standard_user to login successfully', async ({ loginPage, page }) => {
     const user = SAUCE_DEMO_USERS[UserRole.STANDARD];
 
     // Given: User navigates to SauceDemo login page
@@ -51,7 +51,7 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
    *          When the user attempts to login with valid credentials
    *          Then the login should fail with a specific error message
    */
-  test('should block login for locked_out_user with error message', async ({ loginPage, page }) => {
+  test('@smoke @integration @e2e should block login for locked_out_user with error message', async ({ loginPage, page }) => {
     const user = SAUCE_DEMO_USERS[UserRole.LOCKED_OUT];
 
     // Given: User navigates to SauceDemo login page
@@ -76,7 +76,7 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
    *          When the user attempts to login
    *          Then the login should succeed but with noticeable delays
    */
-  test('should allow performance_glitch_user to login with delays', async ({
+  test('@integration @e2e @regression should allow performance_glitch_user to login with delays', async ({
     loginPage,
     page,
   }) => {
@@ -110,7 +110,7 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
    *          When the user attempts to login
    *          Then the login should succeed, but UI issues may be visible on inventory
    */
-  test('should allow problem_user to login (UI issues expected on inventory)', async ({
+  test('@integration @e2e @visual-user should allow problem_user to login (UI issues expected on inventory)', async ({
     loginPage,
     page,
   }) => {
@@ -141,7 +141,7 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
    *          When the user attempts to login
    *          Then the login should succeed initially
    */
-  test('should allow error_user to login successfully', async ({ loginPage, page }) => {
+  test('@integration @e2e @regression should allow error_user to login successfully', async ({ loginPage, page }) => {
     const user = SAUCE_DEMO_USERS[UserRole.ERROR];
 
     // Given: User navigates to SauceDemo login page
@@ -168,7 +168,7 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
    *          When the user attempts to login
    *          Then the login should succeed
    */
-  test('should allow visual_user to login successfully', async ({ loginPage, page }) => {
+  test('@integration @e2e @visual-user should allow visual_user to login successfully', async ({ loginPage, page }) => {
     const user = SAUCE_DEMO_USERS[UserRole.VISUAL];
 
     // Given: User navigates to SauceDemo login page
@@ -200,7 +200,7 @@ test.describe('SauceDemo - Post-Login Inventory (Standard User)', () => {
    *          When the user navigates to inventory
    *          Then the user should see products displayed
    */
-  test('should display products on inventory page for standard_user', async ({
+  test('@smoke @integration @e2e should display products on inventory page for standard_user', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -230,7 +230,7 @@ test.describe('SauceDemo - Post-Login Inventory (Standard User)', () => {
    *          When the user adds a product to cart
    *          Then the cart badge should increment
    */
-  test('should allow standard_user to add product to cart', async ({
+  test('@smoke @integration @e2e should allow standard_user to add product to cart', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -262,7 +262,7 @@ test.describe('SauceDemo - Post-Login Inventory (Standard User)', () => {
    *          When the user logs out via hamburger menu
    *          Then the user should be redirected to login page
    */
-  test('should allow standard_user to logout', async ({ loginPage, inventoryPage }) => {
+  test('@smoke @integration @e2e should allow standard_user to logout', async ({ loginPage, inventoryPage }) => {
     const user = SAUCE_DEMO_USERS[UserRole.STANDARD];
 
     // Given: User is logged in as standard_user

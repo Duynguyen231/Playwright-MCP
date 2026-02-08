@@ -7,10 +7,21 @@ on:
     branches: [main, master, develop]
   workflow_dispatch:
     inputs:
-      test_suite:
-        description: "Test suite to run"
+      test_tag:
+        description: "Select tests to run by tag"
         required: false
         default: "all"
+        type: choice
+        options:
+          - all
+          - "@smoke"
+          - "@integration"
+          - "@regression"
+          - "@e2e"
+          - "@visual"
+          - "@visual-user"
+          - "@critical"
+          - "@problem-user"
 
 permissions:
   contents: read
@@ -56,12 +67,10 @@ jobs:
 
       - name: Run Playwright tests
         run: |
-          if [ "${{ github.event.inputs.test_suite }}" = "all" ] || [ -z "${{ github.event.inputs.test_suite }}" ]; then
+          if [ "${{ github.event.inputs.test_tag }}" = "all" ] || [ -z "${{ github.event.inputs.test_tag }}" ]; then
             npx playwright test
-          elif [ "${{ github.event.inputs.test_suite }}" = "saucedemo" ]; then
-            npx playwright test tests/e2e/saucedemo/
           else
-            npx playwright test "${{ github.event.inputs.test_suite }}"
+            npx playwright test --grep "${{ github.event.inputs.test_tag }}"
           fi
         continue-on-error: true
 

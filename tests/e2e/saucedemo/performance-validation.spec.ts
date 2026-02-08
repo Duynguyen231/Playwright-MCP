@@ -17,7 +17,7 @@ test.describe('SauceDemo - Performance Validation for performance_glitch_user', 
    *          When the login action is performed
    *          Then it should show measurable delay (3+ seconds)
    */
-  test('should show performance delay on login action', async ({ loginPage, page }) => {
+  test('@e2e @regression should show performance delay on login action', async ({ loginPage, page }) => {
     const user = SAUCE_DEMO_USERS[UserRole.PERFORMANCE];
 
     // Given: Performance user navigates to login
@@ -49,7 +49,7 @@ test.describe('SauceDemo - Performance Validation for performance_glitch_user', 
    *          When the inventory page loads
    *          Then it should measure the render time
    */
-  test('should measure inventory page load delay', async ({
+  test('@e2e @regression should measure inventory page load delay', async ({
     loginPage,
     inventoryPage,
     page,
@@ -78,7 +78,7 @@ test.describe('SauceDemo - Performance Validation for performance_glitch_user', 
    *          When the user attempts to add a product to cart
    *          Then the action should be slower than standard_user
    */
-  test('should show delay when adding product to cart', async ({
+  test('@e2e @regression should show delay when adding product to cart', async ({
     loginPage,
     inventoryPage,
   }) => {

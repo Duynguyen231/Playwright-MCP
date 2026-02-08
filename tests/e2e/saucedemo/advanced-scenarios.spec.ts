@@ -17,7 +17,7 @@ test.describe('SauceDemo - Advanced User Scenarios', () => {
    *          When navigating the inventory
    *          Then errors may occur on specific actions
    */
-  test('should allow error_user to access inventory after login', async ({
+  test('@integration @e2e @regression should allow error_user to access inventory after login', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -45,7 +45,7 @@ test.describe('SauceDemo - Advanced User Scenarios', () => {
    *          When on inventory page
    *          Then products should be accessible despite UI issues
    */
-  test('should allow problem_user to view products despite UI issues', async ({
+  test('@integration @e2e @visual-user should allow problem_user to view products despite UI issues', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -77,7 +77,7 @@ test.describe('SauceDemo - Advanced User Scenarios', () => {
    *          When attempting to interact with products
    *          Then actions should function despite UI issues
    */
-  test('should allow problem_user to add products to cart (UI issues expected)', async ({
+  test('@integration @e2e @visual-user should allow problem_user to add products to cart (UI issues expected)', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -112,7 +112,7 @@ test.describe('SauceDemo - Advanced User Scenarios', () => {
    *          When they use their respective credentials
    *          Then outcomes should differ
    */
-  test('should demonstrate different login outcomes for different roles', async ({
+  test('@e2e @regression should demonstrate different login outcomes for different roles', async ({
     loginPage,
   }) => {
     // Test 1: Standard user succeeds
@@ -146,7 +146,7 @@ test.describe('SauceDemo - Advanced User Scenarios', () => {
    *          When accessing direct inventory URL
    *          Then page should be accessible
    */
-  test('should allow error_user to navigate to inventory via direct URL', async ({
+  test('@integration @e2e @regression should allow error_user to navigate to inventory via direct URL', async ({
     loginPage,
     page,
   }) => {

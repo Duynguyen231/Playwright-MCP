@@ -21,7 +21,7 @@ test.describe('SauceDemo - Visual Regression Tests', () => {
    *
    * Note: On first run, baseline is created. Run with --update-snapshots to create baseline.
    */
-  test('should match baseline screenshot for standard_user inventory', async ({
+  test('@visual @regression should match baseline screenshot for standard_user inventory', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -51,7 +51,7 @@ test.describe('SauceDemo - Visual Regression Tests', () => {
    *          When the page is fully loaded
    *          Then visual appearance should be consistent
    */
-  test('should match baseline screenshot for login page', async ({ loginPage }) => {
+  test('@visual @regression should match baseline screenshot for login page', async ({ loginPage }) => {
     // Given: User navigates to login page
     await loginPage.goto();
     await loginPage.usernameInput.waitFor({ state: 'visible' });
@@ -71,7 +71,7 @@ test.describe('SauceDemo - Visual Regression Tests', () => {
    *          Then visual inconsistencies may be apparent
    *          And the screenshot should show visual issues
    */
-  test('should show visual differences for visual_user', async ({
+  test('@visual @visual-user should show visual differences for visual_user', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -104,7 +104,7 @@ test.describe('SauceDemo - Visual Regression Tests', () => {
    *          When the page loads
    *          Then rendering issues may be visible
    */
-  test('should identify potential rendering issues for problem_user', async ({
+  test('@visual @problem-user should identify potential rendering issues for problem_user', async ({
     loginPage,
     inventoryPage,
   }) => {
@@ -137,7 +137,7 @@ test.describe('SauceDemo - Visual Regression Tests', () => {
    *          When on the inventory page
    *          Then essential elements should be visible
    */
-  test('should verify essential UI elements are visible', async ({
+  test('@visual @critical should verify essential UI elements are visible', async ({
     loginPage,
     inventoryPage,
   }) => {
