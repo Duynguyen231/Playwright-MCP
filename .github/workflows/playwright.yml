@@ -113,9 +113,10 @@ jobs:
           cp all-reports/playwright-report-2/* . 2>/dev/null || true
           cp all-reports/playwright-report-3/* . 2>/dev/null || true
           cp all-reports/playwright-report-4/* . 2>/dev/null || true
-          ls -la *.zip
-          # Merge reports - merge-reports looks for .zip files in current directory
-          npx playwright merge-reports --reporter html ./merged-results
+          echo "Blob reports:"
+          ls -la *.zip 2>/dev/null || echo "No .zip files found"
+          # Merge reports - merge-reports finds .zip files in current dir and outputs to specified dir
+          npx playwright merge-reports --reporter html --output ./merged-results
         continue-on-error: true
 
       - name: Upload Report to GitHub Pages
