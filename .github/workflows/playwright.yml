@@ -32,9 +32,9 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    # Use playwright offical docker image to speed up browser startup and avoid installing browsers on each runner
+    # Use playwright official docker image to speed up browser startup and avoid installing browsers on each runner
     container:
-      image: mcr.microsoft.com/playwright:v1.58.2-noble
+      image: mcr.microsoft.com/playwright:v1.57.0
       options: --user 1001
     # Run 4 shards in parallel (matrix), each shard will run with
     strategy:
@@ -54,9 +54,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
 
       - name: Create .env file
         run: |
