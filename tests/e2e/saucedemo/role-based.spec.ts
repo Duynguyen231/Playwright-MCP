@@ -15,6 +15,11 @@ import { SAUCE_DEMO_USERS, UserRole } from '../../fixtures/saucedemo/roles';
  * - performance_glitch_user: User with performance delays
  * - error_user: User experiencing errors
  * - visual_user: User with visual regression issues
+ *
+ * REFACTORED FOR GLOBAL SETUP:
+ * - Login behavior tests: Kept as-is (they test the login flow itself)
+ * - Post-login tests: Use pre-authenticated context from Global Setup
+ *   This eliminates redundant login API calls and improves test performance
  */
 
 test.describe('SauceDemo - Login Behavior by User Role', () => {
@@ -191,89 +196,119 @@ test.describe('SauceDemo - Login Behavior by User Role', () => {
 /**
  * Test Suite: Post-Login Inventory Navigation
  * Purpose: Validate behavior after successful login
+ *
+ * REFACTORED FOR GLOBAL SETUP:
+ * These tests now use pre-authenticated context from Global Setup.
+ * Instead of logging in within each test, they assume authentication
+ * is already complete and start directly on the inventory page.
+ * This eliminates redundant login API calls and improves test speed.
  */
 test.describe('SauceDemo - Post-Login Inventory (Standard User)', () => {
   /**
    * Test: Standard User - View Products
    *
-   * Scenario: Given standard_user is logged in
+   * Scenario: Given standard_user is already authenticated (via Global Setup)
    *          When the user navigates to inventory
    *          Then the user should see products displayed
    */
-  test('@smoke @integration @e2e should display products on inventory page for standard_user', async ({
-    loginPage,
-    inventoryPage,
-  }) => {
-    const user = SAUCE_DEMO_USERS[UserRole.STANDARD];
+  test('@smoke @integration @e2e should display products on inventory page for standard_user', async ({ browser }) => {
+    // Pre-authenticated context from Global Setup
+    const context = await browser.newContext({
+      storageState: '.auth/saucedemo-standard-user.json',
+    });
+    const preAuthPage = await context.newPage();
 
-    // Given: User is logged in as standard_user
-    await loginPage.goto();
-    await loginPage.login(user.username, user.password);
+    try {
+      // Navigate directly to inventory (already authenticated, no login needed)
+      await preAuthPage.goto('https://www.saucedemo.com/inventory.html');
 
-    // When: Page loads the inventory
-    await inventoryPage.waitForPageLoad();
+      // Then: Products should be visible
+      const products = await preAuthPage.locator('[data-test="inventory-item"]');
+      const productCount = await products.count();
+      expect(productCount).toBeGreaterThan(0);
 
-    // Then: Products should be visible
-    const productCount = await inventoryPage.getProductCount();
-    expect(productCount).toBeGreaterThan(0);
-
-    // And: Product names should be retrievable
-    const productNames = await inventoryPage.getProductNames();
-    expect(productNames.length).toBeGreaterThan(0);
-    expect(productNames[0]).toBeTruthy();
+      // And: Product names should be retrievable
+      const firstProductName = await preAuthPage
+        .locator('[data-test="inventory-item-name"]')
+        .first()
+        .textContent();
+      expect(firstProductName).toBeTruthy();
+    } finally {
+      await preAuthPage.close();
+      await context.close();
+    }
   });
 
   /**
    * Test: Standard User - Add Product to Cart
    *
-   * Scenario: Given standard_user is viewing the inventory
+   * Scenario: Given standard_user is already authenticated (via Global Setup)
    *          When the user adds a product to cart
    *          Then the cart badge should increment
    */
-  test('@smoke @integration @e2e should allow standard_user to add product to cart', async ({
-    loginPage,
-    inventoryPage,
-  }) => {
-    const user = SAUCE_DEMO_USERS[UserRole.STANDARD];
+  test('@smoke @integration @e2e should allow standard_user to add product to cart', async ({ browser }) => {
+    // Pre-authenticated context from Global Setup
+    const context = await browser.newContext({
+      storageState: '.auth/saucedemo-standard-user.json',
+    });
+    const preAuthPage = await context.newPage();
 
-    // Given: User is logged in as standard_user
-    await loginPage.goto();
-    await loginPage.login(user.username, user.password);
-    await inventoryPage.waitForPageLoad();
+    try {
+      // Navigate directly to inventory (already authenticated)
+      await preAuthPage.goto('https://www.saucedemo.com/inventory.html');
 
-    // Get initial cart count
-    const initialCartCount = await inventoryPage.getCartItemCount();
+      // Get initial cart count
+      const cartBadge = preAuthPage.locator('[data-test="shopping-cart-badge"]');
+      const initialCartCount = (await cartBadge.isVisible()) ? parseInt(await cartBadge.textContent() || '0') : 0;
 
-    // When: User adds a product to cart
-    const products = await inventoryPage.getProductNames();
-    if (products.length > 0) {
-      await inventoryPage.addProductToCart(products[0]);
+      // When: User adds a product to cart
+      const addToCartButton = preAuthPage.locator('[data-test="add-to-cart-sauce-labs-backpack"]').first();
+      if (await addToCartButton.isVisible()) {
+        await addToCartButton.click();
+      }
+
+      // Then: Cart badge should increase
+      const updatedCartBadge = preAuthPage.locator('[data-test="shopping-cart-badge"]');
+      const updatedCartCount = await updatedCartBadge.textContent();
+      expect(parseInt(updatedCartCount || '0')).toBe(initialCartCount + 1);
+    } finally {
+      await preAuthPage.close();
+      await context.close();
     }
-
-    // Then: Cart badge should increase
-    const updatedCartCount = await inventoryPage.getCartItemCount();
-    expect(updatedCartCount).toBe((initialCartCount || 0) + 1);
   });
 
   /**
    * Test: Standard User - Logout
    *
-   * Scenario: Given standard_user is logged in
+   * Scenario: Given standard_user is already authenticated (via Global Setup)
    *          When the user logs out via hamburger menu
    *          Then the user should be redirected to login page
    */
-  test('@smoke @integration @e2e should allow standard_user to logout', async ({ loginPage, inventoryPage }) => {
-    const user = SAUCE_DEMO_USERS[UserRole.STANDARD];
+  test('@smoke @integration @e2e should allow standard_user to logout', async ({ browser }) => {
+    // Pre-authenticated context from Global Setup
+    const context = await browser.newContext({
+      storageState: '.auth/saucedemo-standard-user.json',
+    });
+    const preAuthPage = await context.newPage();
 
-    // Given: User is logged in as standard_user
-    await loginPage.goto();
-    await loginPage.login(user.username, user.password);
-    await inventoryPage.waitForPageLoad();
+    try {
+      // Navigate directly to inventory (already authenticated)
+      await preAuthPage.goto('https://www.saucedemo.com/inventory.html');
 
-    // When: User logs out
-    await inventoryPage.logout();
+      // When: User logs out via hamburger menu
+      const menuButton = preAuthPage.locator('button[id="react-burger-menu-btn"]');
+      await menuButton.click();
 
-    // Then: User should be redirected to login page
-    await expect(loginPage.usernameInput).toBeVisible();
+      const logoutLink = preAuthPage.locator('a[id="logout_sidebar_link"]');
+      await logoutLink.click();
+
+      // Then: User should be redirected to login page
+      await preAuthPage.waitForURL('**/index.html');
+      const usernameInput = preAuthPage.locator('input[id="user-name"]');
+      expect(await usernameInput.isVisible()).toBe(true);
+    } finally {
+      await preAuthPage.close();
+      await context.close();
+    }
   });
 });
