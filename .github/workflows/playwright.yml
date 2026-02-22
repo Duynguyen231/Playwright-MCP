@@ -108,8 +108,15 @@ jobs:
       - name: Merge reports
         run: |
           mkdir -p ./merged-results
-          ls -la all-reports/
-          npx playwright merge-reports --reporter html ./merged-results all-reports/playwright-report-1 all-reports/playwright-report-2 all-reports/playwright-report-3 all-reports/playwright-report-4
+          mkdir -p ./blob-reports
+          # Copy all blob reports to a single directory
+          cp all-reports/playwright-report-1/* ./blob-reports/ 2>/dev/null || true
+          cp all-reports/playwright-report-2/* ./blob-reports/ 2>/dev/null || true
+          cp all-reports/playwright-report-3/* ./blob-reports/ 2>/dev/null || true
+          cp all-reports/playwright-report-4/* ./blob-reports/ 2>/dev/null || true
+          ls -la ./blob-reports/
+          # Merge all blob reports
+          npx playwright merge-reports --reporter html ./merged-results ./blob-reports
         continue-on-error: true
 
       - name: Upload Report to GitHub Pages
