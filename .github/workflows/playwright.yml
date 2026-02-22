@@ -107,13 +107,15 @@ jobs:
 
       - name: Merge reports
         run: |
-          npx playwright show-report all-reports/playwright-report-1
+          mkdir -p ./merged-results
+          npx playwright merge-reports --reporter html ./merged-results all-reports/playwright-report-*
         continue-on-error: true
 
       - name: Upload Report to GitHub Pages
+        if: always()
         uses: actions/upload-pages-artifact@v3
         with:
-          path: all-reports/playwright-report-1
+          path: ./merged-results
 
   deploy:
     if: always()
