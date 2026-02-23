@@ -84,14 +84,7 @@ jobs:
           name: playwright-report-${{ matrix.shardIndex }}
           path: blob-report/
           retention-days: 30
-
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-${{ matrix.shardIndex }}
-          path: test-results/
-          retention-days: 30
+          if-no-files-found: ignore
 
   merge-reports:
     # Merge all shard reports into one
@@ -161,4 +154,3 @@ jobs:
               body: `## 🎭 Playwright Test Results\n\n✅ Tests completed!\n\n${reportUrl}`
             });
         continue-on-error: true
-
