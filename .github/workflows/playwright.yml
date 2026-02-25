@@ -27,29 +27,8 @@ permissions:
   contents: read
 
 jobs:
-  # ─── Job 1: Install dependencies once in a Node container ───────────────────
-  install:
-    runs-on: ubuntu-latest
-    container:
-      image: node:lts
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm ci
-
-  # ─── Job 2: Run sharded tests in the Playwright container ───────────────────
+  # ─── Single job: Run sharded tests in Playwright Docker container ──────────
   playwright-tests:
-    needs: install
     timeout-minutes: 60
     runs-on: ubuntu-latest
     container:
@@ -64,11 +43,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore node_modules from cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
 
       - name: Create .env file
         run: |
@@ -102,7 +78,7 @@ jobs:
           path: blob-report
           retention-days: 1
 
-  # ─── Job 3: Merge shard reports into one HTML report ────────────────────────
+  # ─── Merge shard reports into one HTML report ───────────────────────────────
   merge-reports:
     if: ${{ !cancelled() }}
     needs: [playwright-tests]
