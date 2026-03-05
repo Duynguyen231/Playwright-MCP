@@ -129,6 +129,14 @@ jobs:
           echo "report_url=${REPORT_URL}" >> "$GITHUB_OUTPUT"
           echo "Report deployed to: ${REPORT_URL}"
 
+      - name: Add report link to job summary
+        run: |
+          echo "## ✅ Playwright Test Report Ready" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**[🔗 Click here to view the test report](${{ steps.set-url.outputs.report_url }})**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run: \`${{ github.run_id }}\` | Attempt: \`${{ github.run_attempt }}\`" >> $GITHUB_STEP_SUMMARY
+
       - name: Comment PR with report link
         uses: actions/github-script@v7
         # Only runs on pull_request events; skipped for push / workflow_dispatch
