@@ -24,7 +24,8 @@ on:
           - "@problem-user"
 
 permissions:
-  contents: read
+  contents: write # Required: push to gh-pages branch
+  pull-requests: write # Required: post comments on PRs
 
 jobs:
   # ─── Single job: Run sharded tests in Playwright Docker container ──────────
@@ -85,15 +86,16 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:lts
+    # Expose the final URL as a job output so other steps can reference it
+    outputs:
+      report_url: ${{ steps.set-url.outputs.report_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore node_modules from cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        # Always run npm ci — don't rely solely on cache in a fresh container
+        run: npm ci
 
       - name: Download blob reports
         uses: actions/download-artifact@v4
@@ -105,7 +107,7 @@ jobs:
       - name: Merge into HTML report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-      - name: Upload HTML report
+      - name: Upload HTML report as artifact
         uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
@@ -114,29 +116,38 @@ jobs:
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
-        if: ${{ !cancelled() }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./playwright-report
+          # Each run gets its own folder, so old reports are never overwritten
           destination_dir: reports/${{ github.run_id }}/attempt-${{ github.run_attempt }}
+
+      - name: Set report URL output
+        id: set-url
+        run: |
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_id }}/attempt-${{ github.run_attempt }}"
+          echo "report_url=${REPORT_URL}" >> "$GITHUB_OUTPUT"
+          echo "Report deployed to: ${REPORT_URL}"
 
       - name: Comment PR with report link
         uses: actions/github-script@v7
+        # Only runs on pull_request events; skipped for push / workflow_dispatch
         if: ${{ github.event_name == 'pull_request' && !cancelled() }}
-        env:
-          RUN_ATTEMPT: ${{ github.run_attempt }}
         with:
           script: |
-            const repoName = context.repo.repo;
-            const repoOwner = context.repo.owner;
-            const runId = context.runId;
-            const runAttempt = process.env.RUN_ATTEMPT;
+            const reportUrl = "${{ steps.set-url.outputs.report_url }}";
 
-            const reportUrl = `https://${repoOwner}.github.io/${repoName}/reports/${runId}/attempt-${runAttempt}`;
-
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## 📊 Test Report Available\n\n✅ Playwright test report has been generated and deployed.\n\n[**Click here to view the full test report**](${reportUrl})\n\nReport ID: ${runId} (Attempt: ${runAttempt})`
+              body: [
+                "## 📊 Playwright Test Report",
+                "",
+                "The test report has been deployed to GitHub Pages.",
+                "",
+                `**[▶ Click here to view the full report](${reportUrl})**`,
+                "",
+                `> Run \`${context.runId}\` · Attempt \`${{ github.run_attempt }}\``
+              ].join("\n")
             });
