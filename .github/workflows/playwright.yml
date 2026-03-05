@@ -111,3 +111,32 @@ jobs:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 14
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: ${{ !cancelled() }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          destination_dir: reports/${{ github.run_id }}/attempt-${{ github.run_attempt }}
+
+      - name: Comment PR with report link
+        uses: actions/github-script@v7
+        if: ${{ github.event_name == 'pull_request' && !cancelled() }}
+        with:
+          script: |
+            const repoName = context.repo.repo;
+            const repoOwner = context.repo.owner;
+            const runId = context.runId;
+            const runAttempt = process.env.RUN_ATTEMPT;
+
+            const reportUrl = `https://${repoOwner}.github.io/${repoName}/reports/${runId}/attempt-${runAttempt}`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 Test Report Available\n\n✅ Playwright test report has been generated and deployed.\n\n[**Click here to view the full test report**](${reportUrl})\n\nReport ID: ${runId} (Attempt: ${runAttempt})`
+            });
+        env:
+          RUN_ATTEMPT: ${{ github.run_attempt }}
